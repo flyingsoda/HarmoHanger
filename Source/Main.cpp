@@ -11,6 +11,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainComponent.h"
 
+
 //==============================================================================
 class ClotheshangerApplication  : public JUCEApplication
 {

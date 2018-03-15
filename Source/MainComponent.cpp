@@ -8,6 +8,9 @@
 
 #include "MainComponent.h"
 
+//DECLARED GLOBAL OBJECT
+//static SpringString line;
+
 //==============================================================================
 MainComponent::MainComponent()
 {
@@ -17,6 +20,7 @@ MainComponent::MainComponent()
 
     // specify the number of input and output channels that we want to open
     setAudioChannels (2, 2);
+
 }
 
 MainComponent::~MainComponent()
@@ -28,6 +32,7 @@ MainComponent::~MainComponent()
 //==============================================================================
 void MainComponent::prepareToPlay (int samplesPerBlockExpected, double sampleRate)
 {
+    line.setSampleRate(sampleRate);
     // This function will be called when the audio device is started, or when
     // its settings (i.e. sample rate, block size, etc) are changed.
 
@@ -46,6 +51,19 @@ void MainComponent::getNextAudioBlock (const AudioSourceChannelInfo& bufferToFil
     // Right now we are not producing any data, in which case we need to clear the buffer
     // (to prevent the output of random noise)
     bufferToFill.clearActiveBufferRegion();
+    
+
+    
+    const float level = 1.f;
+    float* const buffer = bufferToFill.buffer->getWritePointer (0, bufferToFill.startSample);
+    
+    
+    for (int sample = 0; sample < bufferToFill.numSamples; ++sample)
+    {
+       
+        const float currentSample = line.calcMovement();
+        buffer[sample] = currentSample * level;
+    }
 }
 
 void MainComponent::releaseResources()

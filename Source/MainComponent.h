@@ -9,6 +9,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "MSDS.h"
 
 //==============================================================================
 /*
@@ -18,6 +19,7 @@
 class MainComponent   : public AudioAppComponent
 {
 public:
+    SpringString line;
     //==============================================================================
     MainComponent();
     ~MainComponent();
