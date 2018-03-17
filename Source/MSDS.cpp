@@ -32,73 +32,60 @@ SpringString::~SpringString() {
 void SpringString::setSampleRate(double SR){
     SRateStep = 1/SR; //Time step of Oscillator
     nodeString[0].xvel = 5;
-    nodeString[1].xvel = -3;
+    nodeString[1].xpos = 1;
+    nodeString[2].xpos = -1;
+    nodeString[10].xpos = 1;
 }
 
 //Does mass position calculation by iterating mathematics per node
 float SpringString::calcMovement(){
-    
-    //full body calculation of every Node
-    
-    //Operations on only beginning node
-//    makeOld(nodeString[0]);    //Pushes initial values to old
-//    for(int j = 0; j < timeStepValue; j++){
-//        float fnxaccel = -(nodeString[0].oldxpos - nodeString[1].oldxpos) * nodek / nodeMass;
-//        nodeString[0].xvel = euler(nodeString[0].oldxvel, fnxaccel);
-//        nodeString[0].xpos = euler(nodeString[0].oldxpos, nodeString[0].oldxvel);
-//    }
-    
-    //Operations on only end node
-    makeOld(nodeString[nodeNum-1]);
-    //for(int j = 0; j < timeStepValue; j++){
-        float lnxaccel = (nodeString[nodeNum-2].oldxpos + nodeString[nodeNum-1].oldxpos) * nodek / nodeMass;
-    //set nodes for next passthrough
-        nodeString[nodeNum-1].xvel = euler(nodeString[nodeNum-1].oldxvel, -lnxaccel);
-        nodeString[nodeNum-1].xpos = euler(nodeString[nodeNum-1].oldxpos, nodeString[nodeNum-1].oldxvel);
-    
-   //}
-    
-    //Operations on every node except beginning and end
-    for(int i = 1; i < nodeNum-1; i++){
-        makeOld(nodeString[i]);
-        for(int j = 0; j < nodeIt; j++){
-            float force =  -(nodeString[i].oldxpos - nodeString[i-1].oldxpos)*nodek + (nodeString[i].oldxpos - nodeString[i+1].oldxpos)*nodek;
-            float force2 = -(2*nodeString[i].oldxpos - nodeString[i-1].oldxpos - nodeString[i+1].xpos) * nodek;
-            
-            float xaccel = force / nodeMass; //finds new acceleration for oscillator
 
-            //sets new nodeString[i] velocity to new veloctiy from acceleration
-            nodeString[i].xvel = euler(nodeString[i].oldxvel, xaccel/nodeIt);
-
-            //sets and sends new nodeString[i] position using velocity
-            nodeString[i].xpos = 1000;// euler(nodeString[i].oldxpos, nodeString[i].oldxvel/nodeIt);
-            //std::cout << "Got called" << std::endl;
+    for(int j = 0; j < nodeIt; j++){
+        for (int i = 0; i < nodeNum; i++){
+            makeOld(nodeString[i]);
         }
+        //full body calculation of every Node
+        
+                                //  calculation of single node
+                                //    float accel = -(nodeString[10].xpos) * nodek;//- nodeString[nodeNum-1].oldxvel * nodeDamp;
+                                //    accel /= nodeMass;
+                                //
+                                //    //set nodes for next passthrough
+                                //    nodeString[10].xvel = euler(nodeString[10].xvel, accel);
+                                //    nodeString[10].xpos = euler(nodeString[10].xpos, nodeString[10].xvel);
+                                //
+                                //
+        
+
+
+        
+        //Operations on every node except beginning and end
+        for(int i = 1; i < nodeNum-1; i++){
+            
+            float force = -(2*nodeString[i].xpos - nodeString[i-1].oldxpos - nodeString[i+1].xpos) * nodek;
+            float xaccel = force / nodeMass; //finds new acceleration for oscillator
+            
+            //sets new nodeString[i] velocity to new veloctiy from acceleration and
+            //sets and sends new nodeString[i] position using velocity
+            nodeString[i].xvel = euler(nodeString[i].xvel, xaccel/nodeIt);
+            nodeString[i].xpos = euler(nodeString[i].xpos, nodeString[i].xvel/nodeIt);
+        }
+        
+        //Operations on only end node
+        float lnxaccel = (nodeString[nodeNum-2].oldxpos - nodeString[nodeNum-1].xpos) * nodek ;//- nodeString[nodeNum-1].oldxvel * nodeDamp;
+        lnxaccel /= nodeMass;
+        //set nodes for next passthrough
+        nodeString[nodeNum-1].xvel = euler(nodeString[nodeNum-1].xvel, lnxaccel / nodeIt);
+        nodeString[nodeNum-1].xpos = euler(nodeString[nodeNum-1].xpos, nodeString[nodeNum-1].xvel / nodeIt);
     }
-   std::cout << nodeString[0].xpos << " " << nodeString[1].xpos << " " << nodeString[2].xpos << " " << nodeString[3].xpos << std::endl;
+    //std::cout << nodeString[0].xpos << " " << nodeString[1].xpos << " " << nodeString[2].xpos << std::endl;
     
-    
-    
-    
-//
-//    //finds new acceleration for oscillator nodestring[0]
-//    float xaccel = -nodeString[0].xpos * nodek / nodeMass;
-//
-//    //sets new nodeString[0] velocity to new veloctiy from acceleration
-//    nodeString[0].xvel = euler(nodeString[0].xvel, xaccel);
-//
-//    //sets and sends new nodeString[0] position using velocity
-//    nodeString[0].xpos = euler(nodeString[0].xpos, nodeString[0].xvel);
-//
-    //if ((nodeString[0].xpos) > 5 || nodeString[0].xpos < -5 )
-        //std::cout << nodeString[0].xpos << std::endl;
-//
-    return nodeString[0].xpos;
+    return nodeString[1].xpos;
 }
 
 //Naive implementation of position calculation from the node; just X for now.
 float SpringString::euler(float initval, float derval){
-    return initval + SRateStep * derval; //previous position plus the velocity * SampleRate (time)
+    return initval + SRateStep * derval; //previous position plus the velocity * 1/SampleRate (time)
 }
 
 float SpringString::rK4(node &n){

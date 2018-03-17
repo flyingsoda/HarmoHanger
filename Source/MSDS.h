@@ -53,7 +53,7 @@ public:
     //Node distance from each other is length/numNodes.
     //k_val represents spring constant 'k' in F = ma = -kx
     //mass represents individual mass of nodes
-    SpringString(int numNodes = 3, int simIt = 50, float length = 10.f, float k_val = 100000.f, float mass = 10.f, float damping = 10.f);
+    SpringString(int numNodes = 10, int simIt = 100, float length = 10.f, float k_val = 10000000.f, float mass = 1.f, float damping = 10.f);
     ~SpringString();
     
     void setSampleRate(double SR);
